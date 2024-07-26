@@ -36,7 +36,7 @@ class UserList extends Component
 
     public function render()
     {
-        $users = User::where('id', '>', 2)->paginate(10);
+        $users = User::doesntHave('roles')->paginate(10);
 
         return view('livewire.admin.user-list', ['users' => $users])->layout('layouts.admin');
     }

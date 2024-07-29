@@ -21,7 +21,7 @@
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             <livewire:layout.navigation-menu-admin />
             <x-side-bar />
-            
+
             <!-- Page Heading -->
             @if (isset($header))
                 <header class="bg-white dark:bg-gray-800 shadow">
@@ -40,6 +40,8 @@
         </div>
 
         <x-notification />
+        @livewire('wire-elements-modal')
+
         @stack('scripts')
     </body>
 </html>

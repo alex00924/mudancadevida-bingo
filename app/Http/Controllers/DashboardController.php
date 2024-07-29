@@ -13,6 +13,9 @@ class DashboardController extends Controller
             if (auth()->user()->hasRole("admin")) {
                 return redirect(route("admin.order.list"));
             }
+            if (auth()->user()->hasRole("seller")) {
+                return redirect(route("seller.order.list"));
+            }
         }
         return redirect(route("order.new"));
     }
@@ -23,7 +26,7 @@ class DashboardController extends Controller
         $formatted_date = $date->format('Y-m-d H:i:s');
 
         $orders = \App\Models\Orders::where('payment_status', 0)->where('created_at', '<=', $formatted_date)->get();
-        
+
         \MercadoPago\SDK::setAccessToken(env('PIX_ACCESS_TOKEN'));
 
         foreach($orders as $order) {

@@ -6,10 +6,13 @@ use App\Livewire\Admin\CardImages;
 use App\Livewire\Admin\SiteSettings;
 use App\Livewire\Admin\UserList;
 use App\Livewire\Admin\OrderList as AdminOrderList;
+use App\Livewire\Admin\SellerList;
 use App\Livewire\CardList as CustomerCardList;
 use App\Livewire\NewOrder;
 use App\Livewire\OrderDetail;
 use App\Livewire\OrderList;
+use App\Livewire\Seller\SellerOrderList;
+use App\Livewire\Seller\SellerUserList;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -64,8 +67,19 @@ Route::middleware([
     Route::get('order/list', AdminOrderList::class)->name('admin.order.list');
     Route::get('card-imgs', CardImages::class)->name('admin.card.imgs');
     Route::get('setting', SiteSettings::class)->name('admin.setting');
+    Route::get('seller/list', SellerList::class)->name('admin.seller.list');
     Route::get('order/export', [OrdersExportController::class, 'export'])->name('admin.order.export');
 });
+
+Route::middleware([
+    'auth',
+    'role:seller',
+])->prefix("vendedor")->group(function () {
+    Route::get('user/list', SellerUserList::class)->name('seller.user.list');
+    Route::get('order/list', SellerOrderList::class)->name('seller.order.list');
+    Route::get('order/export', [OrdersExportController::class, 'export'])->name('seller.order.export');
+});
+
 require __DIR__.'/auth.php';
 
 Route::get('not-selling-now', function() {

@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\Orders;
 use App\Models\OrderDetails;
 use App\Models\BingoCards;
+use Illuminate\Http\Request;
 
 class NewOrder extends Component
 {
@@ -31,8 +32,16 @@ class NewOrder extends Component
     public $cardPrice = 10;
     public $isEnabledSelling = true;
     public $minimumPurchaseQuantity = 1;
+    public $sellerId = null;
 
-    public function mount() {
+    public function mount(Request $request) {
+        $sellerId = $request->get('vendedor');
+        $seller = User::find($sellerId);
+        if (!empty($seller) && $seller->hasRole('seller')) {
+            $this->sellerId = $sellerId;
+            echo $sellerId;
+        }
+
         if (auth()->check()) {
             $this->name = auth()->user()->name??'';
             $this->city = auth()->user()->city??'';
@@ -247,8 +256,8 @@ class NewOrder extends Component
 
     private function createOrder() {
         $user_id = auth()->user()->id;
-        // Create Orders
-        $order = Orders::create([
+
+        $newOrder = [
             'user_id' => $user_id,
             'quantity' => $this->quantity,
             'price' => $this->quantity * $this->cardPrice,
@@ -257,7 +266,12 @@ class NewOrder extends Component
             'qr_code' => $this->qr_code,
             'qr_code_base64' => $this->qr_code_base64,
             'ticket_url' => $this->ticket_url
-        ]);
+        ];
+        if ($this->sellerId > 0) {
+            $newOrder['seller_id'] = $this->sellerId;
+        }
+        // Create Orders
+        $order = Orders::create($newOrder);
 
         // Fetch next n rows from BingoCard after last ordered number
         $lastOrder = OrderDetails::orderBy('id', 'desc')->first();

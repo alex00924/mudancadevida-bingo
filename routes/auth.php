@@ -32,6 +32,12 @@ Route::middleware('guest')->prefix("admin")->group(function () {
     //     ->name('password.reset');
 });
 
+Route::middleware('guest')->prefix("vendedor")->group(function () {
+    Volt::route('login', 'pages.auth.admin_login')
+        ->name('admin.login');
+});
+
+
 Route::middleware(['auth'])->group(function () {
     Volt::route('verify-email', 'pages.auth.verify-email')
         ->name('verification.notice');

@@ -12,25 +12,26 @@ class UserList extends Component
     use WithPagination;
 
     public function clearData() {
-        \App\Models\User::truncate();
+        User::doesntHave('roles')->delete();
+        // \App\Models\User::truncate();
         \App\Models\OrderDetails::truncate();
         \App\Models\Orders::truncate();
 
-        $adminUser = \App\Models\User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'bingo_admin@dbilhar.com',
-            'password' => Hash::make("bingo_admin")
-        ]);
+        // $adminUser = \App\Models\User::factory()->create([
+        //     'name' => 'Admin',
+        //     'email' => 'bingo_admin@dbilhar.com',
+        //     'password' => Hash::make("bingo_admin")
+        // ]);
 
-        $adminUser->assignRole('admin');
+        // $adminUser->assignRole('admin');
 
-        $otherAdmin = \App\Models\User::factory()->create([
-            'name' => 'Ronaldo Correia',
-            'email' => 'contato@chapadahost.com.br',
-            'password' => Hash::make("Senha134882*")
-        ]);
+        // $otherAdmin = \App\Models\User::factory()->create([
+        //     'name' => 'Ronaldo Correia',
+        //     'email' => 'contato@chapadahost.com.br',
+        //     'password' => Hash::make("Senha134882*")
+        // ]);
 
-        $otherAdmin->assignRole('admin');
+        // $otherAdmin->assignRole('admin');
         $this->resetPage();
     }
 

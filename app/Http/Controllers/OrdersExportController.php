@@ -33,6 +33,7 @@ class OrdersExportController extends Controller
             $orderDetail['NOMECILENTE'] = $order->user->name;
             $orderDetail['FONECLIENTE'] = $order->user->phone;
             $orderDetail['CIDADE'] = $order->user->city;
+            $orderDetail['VENDEDOR'] = empty($order->seller) ? "Site" : $order->seller->name;
             $orderDetail['VALOR'] = $order->price;
             $paymentStatus = "Aguardando Pagamento";
             if ($order->payment_status == 1)  {

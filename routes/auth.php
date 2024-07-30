@@ -34,7 +34,7 @@ Route::middleware('guest')->prefix("admin")->group(function () {
 
 Route::middleware('guest')->prefix("vendedor")->group(function () {
     Volt::route('login', 'pages.auth.admin_login')
-        ->name('admin.login');
+        ->name('vendedor.login');
 });
 
 

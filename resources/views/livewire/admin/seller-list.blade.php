@@ -13,9 +13,6 @@
                         {{__('NOME')}}
                     </th>
                     <th scope="col" class="px-6 py-3">
-                        {{__('E-mail')}}
-                    </th>
-                    <th scope="col" class="px-6 py-3">
                         {{__('TELEFONE')}}
                     </th>
                     <th scope="col" class="px-6 py-3">
@@ -29,7 +26,7 @@
             <tbody>
                 @if(empty($users) || count($users) < 1)
                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                        <th scope="row" colspan="5" class="text-center px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <th scope="row" colspan="4" class="text-center px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                             Sem dados
                         </th>
                     </tr>
@@ -40,9 +37,6 @@
                                 {{$item->name}}
                             </th>
                             <td class="px-6 py-4">
-                                {{$item->email}}
-                            </td>
-                            <td class="px-6 py-4">
                                 {{$item->phone}}
                             </td>
                             <td class="px-6 py-4">
@@ -50,7 +44,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 <button type="button" class="inline-block mt-2 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                    wire:click="$dispatch('openModal', { component: 'admin.seller-edit', arguments: { user: {{ $item->id }} } })">
+                                    wire:click="$dispatch('openModal', { component: 'admin.seller-edit', arguments: { userId: {{ $item->id }} } })">
                                     Editar
                                 </button>
                                 <button type="button" class="inline-block mt-2 md:ml-2 text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm p-2.5 text-center items-center me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"

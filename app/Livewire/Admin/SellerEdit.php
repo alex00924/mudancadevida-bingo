@@ -10,7 +10,6 @@ class SellerEdit extends ModalComponent
 {
     public $userId;
     public $name;
-    public $email;
     public $phone;
     public $password;
 
@@ -20,7 +19,6 @@ class SellerEdit extends ModalComponent
         if (!empty($user)) {
             $this->userId = $userId;
             $this->name = $user->name;
-            $this->email = $user->email;
             $this->phone = $user->phone;
         }
     }
@@ -29,8 +27,7 @@ class SellerEdit extends ModalComponent
     {
         $rule = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class . ',email, ' . $this->userId],
-            'phone' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:255', 'unique:' . User::class . ',phone, ' . $this->userId, 'regex:/\([0-9]{2}\) [0-9]{5}-[0-9]{4}/'],
         ];
         if (!isset($this->userId)) {
             $rule['password'] = ['required'];
@@ -39,7 +36,7 @@ class SellerEdit extends ModalComponent
 
         $newData = [
             'name' => $this->name,
-            'email' => $this->email,
+            'email' => $this->phone,
             'phone' => $this->phone,
         ];
         if (!empty($this->password)) {

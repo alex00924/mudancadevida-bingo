@@ -10,16 +10,10 @@
             <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" wire:model.lazy="name" required autocomplete="name" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
-        <!-- Email -->
-        <div class="px-3">
-            <x-input-label for="email" value="E-mail" />
-            <x-text-input id="email" class="block mt-1 w-full" type="text" name="email" wire:model.lazy="email" required autocomplete="email" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
         <!-- Phone -->
         <div class="px-3">
             <x-input-label for="phone" value="Telefone" />
-            <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" wire:model.lazy="phone"/>
+            <x-text-input x-mask="(99) 99999-9999" wire:model="phone" id="phone" class="block mt-1 w-full" name="phone" required placeholder="(__) _____-____"/>
             <x-input-error :messages="$errors->get('phone')" class="mt-2" />
         </div>
         <!-- Password -->

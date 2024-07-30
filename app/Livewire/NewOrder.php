@@ -39,7 +39,6 @@ class NewOrder extends Component
         $seller = User::find($sellerId);
         if (!empty($seller) && $seller->hasRole('seller')) {
             $this->sellerId = $sellerId;
-            echo $sellerId;
         }
 
         if (auth()->check()) {

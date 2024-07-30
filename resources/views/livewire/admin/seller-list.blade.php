@@ -4,6 +4,11 @@
             wire:click="$dispatch('openModal', { component: 'admin.seller-edit' })">
             Novo vendedor
         </button>
+        <button type="button" class="block mt-2 md:ml-5 text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm p-2.5 text-center items-center me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+            wire:click="clearData"
+            wire:confirm="Você quer limpar os dados?">
+            Redefinir vendedor
+        </button>
     </div>
     <div class="overflow-auto w-full">
         <table class="w-full mt-5 text-sm text-left text-gray-500 dark:text-gray-400">

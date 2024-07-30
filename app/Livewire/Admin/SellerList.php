@@ -21,6 +21,11 @@ class SellerList extends Component
         $this->resetPage();
     }
 
+    public function clearData() {
+        User::role('seller')->delete();
+        $this->resetPage();
+    }
+
     public function render()
     {
         $users = User::role('seller')->paginate(10);

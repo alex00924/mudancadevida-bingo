@@ -1,6 +1,6 @@
 <div>
     <p class="text-lg text-gray-500 dark:text-white">
-        Número de cartas: <span class="text-blue-500">{{$totalCards}}</span> / Preço total: <span class="text-blue-500">{{$totalPrice}}R$</span>
+        Quantidade de Cartelas: <span class="text-blue-500">{{$totalCards}}</span> / Preço total: <span class="text-blue-500">{{$totalPrice}}R$</span>
     </p>
     <p class="mt-4 text-lg text-gray-500 dark:text-white">
         Vendedor URL:  <span class="text-blue-500"> {{ route('order.new') . "?vendedor=" . auth()->user()->id }}</span>

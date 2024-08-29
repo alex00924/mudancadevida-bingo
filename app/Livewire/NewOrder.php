@@ -212,7 +212,7 @@ class NewOrder extends Component
             $phoneNumber = substr($phoneNumber, 2);
 
             $expireDate = date("Y-m-d\TH:i:s.000P", strtotime("+30 minutes"));
-            $payment->transaction_amount = $this->quantity * $this->cardPrice;
+            $payment->transaction_amount = number_format($this->quantity * $this->cardPrice, 2);
             $payment->description = "Pagamento de Prêmios D'BILHAR";
             $payment->payment_method_id = "pix";
             $payment->date_of_expiration = $expireDate;

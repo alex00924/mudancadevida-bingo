@@ -7,7 +7,7 @@ use Livewire\Component;
 class CardList extends Component
 {
     public $rand = "";
-    public $cards;
+    public $cards = [];
     public function mount() {
         $this->rand = rand();
         $orders = auth()->user()->orders;

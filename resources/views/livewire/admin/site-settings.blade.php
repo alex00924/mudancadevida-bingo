@@ -1,5 +1,5 @@
-<div>
-    <div class="mt-8 p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <a href="#">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Iniciar/Parar Venda</h5>
         </a>
@@ -11,7 +11,19 @@
         </div>
     </div>
 
-    <div class="mt-8 p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div class="p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <a href="#">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Ordem aleatória de cartas</h5>
+        </a>
+        <div class="mt-5">
+            <button type="button" class="ml-5 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                wire:click="toggleIsCardRandomOrder">
+                {{ $isCardRandomOrder ? "Aleatoriamente" : "Sequencialmente" }}
+            </button>
+        </div>
+    </div>
+
+    <div class="p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <a href="#">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Preço do cartão</h5>
         </a>
@@ -28,7 +40,7 @@
         </div>
     </div>
 
-    <div class="mt-8 p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div class="p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <a href="#">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Quantidade mínima de compra</h5>
         </a>
@@ -45,7 +57,7 @@
         </div>
     </div>
 
-    <div class="mt-8 p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div class="p-5 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <a href="#">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Índice de vendas inicial e final</h5>
         </a>

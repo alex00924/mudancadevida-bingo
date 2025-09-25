@@ -36,6 +36,16 @@ class SiteSetting extends Model
         self::_setSetting("maintenance_mode", $maintenanceValue);
     }
 
+    public static function isCardRandomOrder() {
+        $randomOrder = self::_getSetting("card_random_order", "no");
+        return $randomOrder == "yes";
+    }
+
+    public static function setCardRandomOrder($isRandomOrder) {
+        $randomOrder = $isRandomOrder ? "yes" : "no";
+        self::_setSetting("card_random_order", $randomOrder);
+    }
+
     public static function getStartSelling() {
         return self::_getSetting("start_selling", 1);
     }

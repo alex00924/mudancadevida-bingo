@@ -11,30 +11,32 @@ class SiteSettings extends Component
     public $enabledSelling = true;
     public $startSelling = 1;
     public $endSelling = 10000000;
+    public $isCardRandomOrder = false;
 
-    protected function rules()
-    {
-        return [
-            'price' => ['required', 'numeric', 'gt:0'],
-            'minimumQuantity' => ['required', 'numeric', 'gt:0'],
-        ];
-    }
     public function mount() {
         $this->price = \App\Models\SiteSetting::getPrice();
         $this->minimumQuantity = \App\Models\SiteSetting::getMinimumPurchaseQuantity();
         $this->enabledSelling = \App\Models\SiteSetting::isEnabledSelling();
         $this->startSelling = \App\Models\SiteSetting::getStartSelling();
         $this->endSelling = \App\Models\SiteSetting::getEndSelling();
+        $this->isCardRandomOrder = \App\Models\SiteSetting::isCardRandomOrder();
     }
 
     public function setPriceValue() {
-        $this->validate();
+        $rule = [
+            'price' => ['required', 'numeric', 'gt:0']
+        ];
+        $this->validate($rule);
         \App\Models\SiteSetting::setPrice($this->price);
         $this->notify("Preço atualizado");
     }
 
     public function setMinimumQuantity() {
-        $this->validate();
+        $rule = [
+            'price' => ['required', 'numeric', 'gt:0'],
+            'minimumQuantity' => ['required', 'numeric', 'gt:0'],
+        ];
+        $this->validate($rule);
         \App\Models\SiteSetting::setMinimumPurchaseQuantity($this->minimumQuantity);
         $this->notify("Quantidade mínima de compra salva");
     }
@@ -53,6 +55,11 @@ class SiteSettings extends Component
     public function toggleEnableSelling() {
         $this->enabledSelling = !$this->enabledSelling;
         \App\Models\SiteSetting::setEnableSelling($this->enabledSelling);
+    }
+
+     public function toggleIsCardRandomOrder() {
+        $this->isCardRandomOrder = !$this->isCardRandomOrder;
+        \App\Models\SiteSetting::setCardRandomOrder($this->isCardRandomOrder);
     }
 
     public function render()

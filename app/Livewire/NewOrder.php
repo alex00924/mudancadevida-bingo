@@ -232,6 +232,7 @@ class NewOrder extends Component
 
             $createdRequest = $payment->save();
             if (!$createdRequest || empty($payment->id)) {
+                $this->notify($payment->__get("error")->__toString(), "error");
                 return false;
             }
 
@@ -272,17 +273,34 @@ class NewOrder extends Component
         // Create Orders
         $order = Orders::create($newOrder);
 
-        // Fetch next n rows from BingoCard after last ordered number
-        $lastOrder = OrderDetails::orderBy('id', 'desc')->first();
-        $lastId = 0;
-        if (!empty($lastOrder)) {
-            $lastId = $lastOrder->bingo_card_id;
-        }
+        // Fetch bingo cards according to random/sequential order setting
+        $isRandomOrder = \App\Models\SiteSetting::isCardRandomOrder();
+        $bingoCards = collect();
         $startSelling = \App\Models\SiteSetting::getStartSelling();
-        $lastId = max($lastId, $startSelling-1);
-
-        $bingoCards = BingoCards::where('id', '>', $lastId)
-            ->limit($this->quantity)->get();
+        if ($isRandomOrder) {
+            // Fetch random unsold cards with id >= startSelling
+            // $soldCardIds = OrderDetails::pluck('bingo_card_id')->toArray();
+            // $bingoCards = BingoCards::whereNotIn('id', $soldCardIds)
+            //     ->where('id', '>=', $startSelling)
+            //     ->inRandomOrder()
+            //     ->limit($this->quantity)
+            //     ->get();
+            $bingoCards = BingoCards::whereNotIn('id', function($query) {
+                $query->select('bingo_card_id')->from('order_details');
+            })
+            ->where('id', '>=', $startSelling)
+            ->inRandomOrder()
+            ->limit($this->quantity)
+            ->get();
+        } else {
+            // Fetch sequential cards after the largest sold card or startSelling-1
+            $soldCardId = OrderDetails::max('bingo_card_id');
+            $lastId = max($soldCardId ?? 0, $startSelling-1);
+            $bingoCards = BingoCards::where('id', '>', $lastId)
+                ->orderBy('id')
+                ->limit($this->quantity)
+                ->get();
+        }
 
         foreach($bingoCards as $bingoCard) {
             OrderDetails::create([

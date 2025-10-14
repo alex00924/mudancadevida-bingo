@@ -75,7 +75,7 @@
                                 {{$item->id}}
                             </th>
                             <td class="px-6 py-4">
-                                {{$item->cardNumbers()}}
+                                {{$item->cardNumbers($cardFilter)}}
                             </td>
                             <td class="px-6 py-4">
                                 {{$item->user->name}}

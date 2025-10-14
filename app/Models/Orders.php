@@ -23,14 +23,19 @@ class Orders extends Model
         return $this->hasMany(OrderDetails::class, 'order_id', 'id');
     }
 
-    public function cardNumbers() {
+    public function cardNumbers($filter = null) {
         $orderDetails = $this->orderDetails;
-
         $cardNumbers = [];
         foreach($orderDetails as $detail) {
-            $cardNumbers[] = $detail->bingoCard->card_number . "-" . $detail->bingoCard->card_digit;
+            $num = $detail->bingoCard->card_number . "-" . $detail->bingoCard->card_digit;
+            if ($filter) {
+                if (stripos($num, $filter) !== false) {
+                    $cardNumbers[] = $num;
+                }
+            } else {
+                $cardNumbers[] = $num;
+            }
         }
-
         return implode(",", $cardNumbers);
     }
 

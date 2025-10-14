@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use \DateTime;
+use Efi\EfiPay;
+use Efi\Exception\EfiException;
 
 class DashboardController extends Controller
 {
@@ -37,6 +39,31 @@ class DashboardController extends Controller
             } catch (\Exception) {}
 
             if ($status == 'approved') {
+                $order->payment_status = 1;
+                $order->save();
+            } else {
+                $order->orderDetails()->delete();
+                $order->delete();
+            }
+        }
+    }
+
+    public function checkEFIPaymentStatus() {
+        $date = new DateTime;
+        $date->modify('-5 minutes');
+        $formatted_date = $date->format('Y-m-d H:i:s');
+        $efi = new EfiPay(config('efi'));   // config holds clientId/secret/cert/sandbox/scope
+
+        $orders = \App\Models\Orders::where('payment_status', 0)->where('created_at', '<=', $formatted_date)->get();
+
+        foreach($orders as $order) {
+            $status = '';
+            try {
+                $resp = $efi->pixDetailCharge(['txid' => $order->payment_id]);
+                $status = $resp['status'];
+            } catch (\Exception) {}
+
+            if ($status == 'CONCLUIDA') {
                 $order->payment_status = 1;
                 $order->save();
             } else {

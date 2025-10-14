@@ -47,6 +47,7 @@ Route::get('/artisan/{cmd}', function ($cmd) {
 Route::get('/', [DashboardController::class, 'index']);
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/check-payment-status', [DashboardController::class, 'checkPaymentStatus']);
+Route::get('/check-efi-payment-status', [DashboardController::class, 'checkEFIPaymentStatus']);
 
 Route::get('order/new', NewOrder::class)->name('order.new');//->middleware(['card-selling']);
 

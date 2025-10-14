@@ -17,6 +17,8 @@ use App\Models\Orders;
 use App\Models\OrderDetails;
 use App\Models\BingoCards;
 use Illuminate\Http\Request;
+use Efi\EfiPay;
+use Efi\Exception\EfiException;
 
 class NewOrder extends Component
 {
@@ -122,7 +124,7 @@ class NewOrder extends Component
         }
 
         if ($this->processStatus == 2) {
-            $createdPaymentRequest = $this->createPaymentRequest();
+            $createdPaymentRequest = $this->createPaymentRequestEfi();
             if (!$createdPaymentRequest) {
                 $this->notify("Algo deu errado! Por favor, tente novamente", "Error", "error");
                 return;
@@ -195,6 +197,7 @@ class NewOrder extends Component
     private function createPaymentRequest() {
         // Step 2: Set production or sandbox access token
         \MercadoPago\SDK::setAccessToken(env('PIX_ACCESS_TOKEN'));
+
         // MercadoPagoConfig::setAccessToken(env('PIX_ACCESS_TOKEN'));
         // Step 2.1 (optional - default is SERVER): Set your runtime enviroment from MercadoPagoConfig::RUNTIME_ENVIROMENTS
         // In case you want to test in your local machine first, set runtime enviroment to LOCAL
@@ -247,6 +250,60 @@ class NewOrder extends Component
         }
 
         return true;
+    }
+
+    private function createPaymentRequestEfi(): bool
+    {
+        // init client
+        $efi = new EfiPay(config('efi'));
+
+        try {
+            // Format amount as string with dot decimal (e.g. "25.90")
+            $amount = number_format($this->quantity * $this->cardPrice, 2, '.', '');
+
+            // Mercado Pago used a timestamp expiration; Efí uses seconds (e.g. 1800 = 30 min)
+            $expirationSeconds = 30 * 60;
+
+            // ---- 1) Create immediate charge (Cob) ----
+            $body = [
+                'calendario' => ['expiracao' => $expirationSeconds],
+                'devedor'    => array_filter([
+                    // Provide if you have them; Pix allows anonymous payer too
+                    'nome' => $this->name,
+                    'cpf'  => '17212309800', // if you collected it
+                ]),
+                'valor'      => ['original' => $amount],
+                'chave'      => env('EFI_PIX_KEY'), // your Pix key (evp/cnpj/email)
+                'solicitacaoPagador' => "Pagamento de Prêmios D'BILHAR",
+            ];
+
+            $cob = $efi->pixCreateImmediateCharge($params = [], $body);
+
+            if ($cob['txid']) {
+                // ---- 2) Generate QR for the charge location ----
+                $locId = $cob['loc']['id'];
+                $qr    = $efi->pixGenerateQRCode(['id' => $locId]);
+                // Mirror Mercado Pago fields into your object:
+                $this->payment_request_id = $cob['txid']; // Efí doesn’t give "payment id" like MP; use txid
+                $this->qr_code_base64     = $qr['imagemQrcode'];  // base64 PNG (data:image/png;base64,...)
+                $this->qr_code            = $qr['qrcode'];        // EMV payload string
+                $this->ticket_url         = $qr['linkVisualizacao'] ?? null; // optional short link if present
+                return true;
+            } else {
+                $this->notify($cob['error'] ?? 'Unknown error', "Error", "error");
+                return false;
+            }
+            // Persist to DB (example if you're building an Order here)
+            // \App\Models\Orders::create([... 'txid' => $txid, 'loc_id' => $locId, 'qr_code_text' => $qr['qrcode'], 'qr_code_base64' => $qr['imagemQrcode'], 'payment_status' => 0, ...]);
+
+
+        } catch (EfiException $e) {
+            $this->notify($e->getMessage(), "Error", "error");
+            return false;
+        } catch (\Throwable $e) {
+            $this->notify($e->getMessage(), "Error", "error");
+            return false;
+        }
     }
 
     public function changeQuantity($amount = 1) {

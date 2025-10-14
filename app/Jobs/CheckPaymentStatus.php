@@ -8,6 +8,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use \DateTime;
+use Efi\EfiPay;
+use Efi\Exception\EfiException;
 
 class CheckPaymentStatus implements ShouldQueue
 {
@@ -21,10 +23,37 @@ class CheckPaymentStatus implements ShouldQueue
         //
     }
 
+    // EFI payment status
+    public function handle(): void
+    {
+        $date = new DateTime;
+        $date->modify('-5 minutes');
+        $formatted_date = $date->format('Y-m-d H:i:s');
+        $efi = new EfiPay(config('efi'));   // config holds clientId/secret/cert/sandbox/scope
+
+        $orders = \App\Models\Orders::where('payment_status', 0)->where('created_at', '<=', $formatted_date)->get();
+
+        foreach($orders as $order) {
+            $status = '';
+            try {
+                $resp = $efi->pixDetailCharge(['txid' => $order->payment_id]);
+                $status = $resp['status'];
+            } catch (\Exception) {}
+
+            if ($status == 'CONCLUIDA') {
+                $order->payment_status = 1;
+                $order->save();
+            } else {
+                $order->orderDetails()->delete();
+                $order->delete();
+            }
+        }
+    }
+
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle_PIX(): void
     {
         $date = new DateTime;
         $date->modify('-5 minutes');

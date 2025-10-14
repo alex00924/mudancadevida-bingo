@@ -4,9 +4,9 @@
             Cartões de bingo
         </h5>
 
-        <div class="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="mt-4 flex flex-wrap justify-center gap-4">
             @foreach ($cards as $card)
-                <div class="w-full border border-yellow_border">
+                <div class="border border-yellow_border" style="width: 270px;">
                     <img src="/storage/imgs/card.jpeg?dummy={{$rand}}" class="w-full" />
                     <div class="bg-white p-4">
                         <p class="pl-4 md:pl-8 my-2 md:my-4 text-xl font-bold text-gray-900 dark:text-gray-200"><span class="underline">{{$card['card_number']}}-{{$card['card_digit']}}</p>

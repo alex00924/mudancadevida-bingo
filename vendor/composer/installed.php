@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '9b2e22ab4df7e798fd101d8a07c00534303f3209',
+        'reference' => '0275429a5fe91c679c6c8399adcffc2ae4e79f4b',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -127,6 +127,15 @@
             'reference' => 'adfb1f505deb6384dc8b39804c5065dd3c8c8c0a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../dragonmantank/cron-expression',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'efipay/sdk-php-apis-efi' => array(
+            'pretty_version' => '1.17.0',
+            'version' => '1.17.0.0',
+            'reference' => '7cb6bdf000bf604bc0b2240ae81fbb53d68bda24',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../efipay/sdk-php-apis-efi',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -454,7 +463,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '9b2e22ab4df7e798fd101d8a07c00534303f3209',
+            'reference' => '0275429a5fe91c679c6c8399adcffc2ae4e79f4b',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -910,8 +919,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '3.0.0',
-                1 => '1.0|2.0|3.0',
+                0 => '1.0|2.0|3.0',
+                1 => '3.0.0',
             ),
         ),
         'psr/simple-cache' => array(

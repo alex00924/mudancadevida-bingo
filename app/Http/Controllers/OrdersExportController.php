@@ -11,50 +11,72 @@ class OrdersExportController extends Controller
 {
     public function export()
     {
+        // Increase memory and execution time for large exports
+        ini_set('memory_limit', '512M');
+        set_time_limit(0);
+
         $headers = [
-                'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0'
-            ,   'Content-type'        => 'text/csv'
-            ,   'Content-Disposition' => 'attachment; filename=pedidos.csv'
-            ,   'Expires'             => '0'
-            ,   'Pragma'              => 'public'
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Content-type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename=pedidos.csv',
+            'Expires'             => '0',
+            'Pragma'              => 'public',
         ];
 
-        if (auth()->user()->hasRole('admin')) {
-            $orders = OrdersModel::all();
-        } else {
-            $orders = OrdersModel::where('seller_id', auth()->user()->id)->get();
-        }
+        $isAdmin = auth()->user()->hasRole('admin');
 
-        $exportData = [];
-        foreach($orders as $order) {
-            $orderDetail = [];
-            $orderDetail['IDVENDA'] = $order->id;
-            $orderDetail['CARTELAS'] = $order->cardNumbers();
-            $orderDetail['NOMECILENTE'] = $order->user->name;
-            $orderDetail['FONECLIENTE'] = $order->user->phone;
-            $orderDetail['CIDADE'] = $order->user->city;
-            $orderDetail['VENDEDOR'] = empty($order->seller) ? "Site" : $order->seller->name;
-            $orderDetail['VALOR'] = $order->price;
-            $paymentStatus = "Aguardando Pagamento";
-            if ($order->payment_status == 1)  {
-                $paymentStatus = "Pago";
-            } else if ($order->payment_status == 1)  {
-                $paymentStatus = "Falha no pagamento";
+        $callback = function() use ($isAdmin) {
+            // Disable output buffering for streaming
+            if (function_exists('ob_end_clean')) {
+                while (ob_get_level() > 0) {
+                    ob_end_clean();
+                }
             }
-            $orderDetail['SITUACAO'] = $paymentStatus;
-            $orderDetail['DATA'] = $order->created_at;
-            $exportData[] = $orderDetail;
-        }
-
-        # add headers for each column in the CSV download
-        array_unshift($exportData, array_keys($exportData[0]));
-
-        $callback = function() use ($exportData)
-        {
             $FH = fopen('php://output', 'w');
-            foreach ($exportData as $row) {
-                fputcsv($FH, $row, ";");
+            // Write CSV header
+            $header = [
+                'IDVENDA',
+                'CARTELAS',
+                'NOMECILENTE',
+                'FONECLIENTE',
+                'CIDADE',
+                'VENDEDOR',
+                'VALOR',
+                'SITUACAO',
+                'DATA',
+            ];
+            fputcsv($FH, $header, ";");
+
+            $query = OrdersModel::query();
+            if (!$isAdmin) {
+                $query->where('seller_id', auth()->user()->id);
             }
+
+            $query->chunk(50, function($orders) use ($FH) {
+                foreach ($orders as $order) {
+                    $orderDetail = [];
+                    $orderDetail['IDVENDA'] = $order->id;
+                    $orderDetail['CARTELAS'] = method_exists($order, 'cardNumbers') ? $order->cardNumbers() : '';
+                    $orderDetail['NOMECILENTE'] = $order->user->name ?? '';
+                    $orderDetail['FONECLIENTE'] = $order->user->phone ?? '';
+                    $orderDetail['CIDADE'] = $order->user->city ?? '';
+                    $orderDetail['VENDEDOR'] = empty($order->seller) ? "Site" : ($order->seller->name ?? '');
+                    $orderDetail['VALOR'] = $order->price;
+                    $paymentStatus = "Aguardando Pagamento";
+                    if ($order->payment_status == 1) {
+                        $paymentStatus = "Pago";
+                    } else if ($order->payment_status == 2) {
+                        $paymentStatus = "Falha no pagamento";
+                    }
+                    $orderDetail['SITUACAO'] = $paymentStatus;
+                    $orderDetail['DATA'] = $order->created_at;
+                    fputcsv($FH, $orderDetail, ";");
+                }
+                // Flush output buffer to avoid memory issues
+                if (function_exists('flush')) {
+                    flush();
+                }
+            });
             fclose($FH);
         };
 

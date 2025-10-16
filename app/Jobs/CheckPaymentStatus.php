@@ -27,7 +27,7 @@ class CheckPaymentStatus implements ShouldQueue
     public function handle(): void
     {
         $date = new DateTime;
-        $date->modify('-5 minutes');
+        $date->modify('-30 minutes');
         $formatted_date = $date->format('Y-m-d H:i:s');
         $efi = new EfiPay(config('efi'));   // config holds clientId/secret/cert/sandbox/scope
 

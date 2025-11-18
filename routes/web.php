@@ -12,6 +12,7 @@ use App\Livewire\NewOrder;
 use App\Livewire\OrderDetail;
 use App\Livewire\OrderList;
 use App\Livewire\Seller\SellerOrderList;
+use App\Livewire\Seller\ManualOrder;
 use App\Livewire\Seller\SellerUserList;
 use Illuminate\Support\Facades\Route;
 
@@ -79,6 +80,7 @@ Route::middleware([
     Route::get('user/list', SellerUserList::class)->name('seller.user.list');
     Route::get('order/list', SellerOrderList::class)->name('seller.order.list');
     Route::get('order/export', [OrdersExportController::class, 'export'])->name('seller.order.export');
+    Route::get('order/new', ManualOrder::class)->name('seller.order.new');
 });
 
 require __DIR__.'/auth.php';

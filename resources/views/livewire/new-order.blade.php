@@ -27,7 +27,7 @@
                         <!-- Name -->
                         <div>
                             <div class="text-center"><x-input-label for="name" :value="__('NOME')" /></div>
-                            <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" name="name" required autofocus autocomplete="name" />
+                            <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" name="name" autofocus autocomplete="name" />
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 
@@ -49,7 +49,7 @@
                         <!-- City -->
                         <div class="mt-4">
                             <div class="text-center"><x-input-label for="city" :value="__('CIDADE')" /></div>
-                            <x-text-input wire:model="city" id="city" class="block mt-1 w-full" type="text" name="city" required autocomplete="city" />
+                            <x-text-input wire:model="city" id="city" class="block mt-1 w-full" type="text" name="city" autocomplete="city" />
                             <x-input-error :messages="$errors->get('city')" class="mt-2" />
                         </div>
 

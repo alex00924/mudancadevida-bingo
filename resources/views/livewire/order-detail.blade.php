@@ -37,7 +37,7 @@
                         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white text-center underline">
                             QR Code
                         </h5>
-                        <img src="data:image/jpeg;base64,{{$order->qr_code_base64}}" class="w-64 h-64 mx-auto mt-2"/>
+                        <img src="{{$order->qr_code_base64}}" class="w-64 h-64 mx-auto mt-2"/>
 
                         <h6 class="text-xl text-gray-900 dark:text-white text-center mt-4">
                             Ou se preferir copie o código abaixo para realizar o pagamento:

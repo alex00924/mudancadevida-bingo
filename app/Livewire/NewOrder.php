@@ -80,9 +80,9 @@ class NewOrder extends Component
             }
 
             $rules = [
-                'name' => ['required', 'string', 'max:255'],
+                'name' => ['nullable', 'string', 'max:255'],
                 'phone' => ['required', 'regex:/\([0-9]{2}\) [0-9]{5}-[0-9]{4}/'],
-                'city' => ['required', 'string', 'max:255'],
+                'city' => ['nullable', 'string', 'max:255'],
                 'quantity' => ['required', 'integer', "min:$this->minimumPurchaseQuantity"]
             ];
 
@@ -95,11 +95,11 @@ class NewOrder extends Component
             $user = User::where('phone', $this->phone)->first();
             if (empty($user)) {
                 $user = User::create([
-                    'name' => $this->name,
+                    'name' => $this->name ?? '',
                     'phone' => $this->phone,
                     'email' => $this->phone,
                     'password' => Hash::make('123456789'),
-                    'city' => $this->city
+                    'city' => $this->city ?? ''
                 ]);
 
                 event(new Registered($user));
@@ -269,7 +269,7 @@ class NewOrder extends Component
                 'calendario' => ['expiracao' => $expirationSeconds],
                 'devedor'    => array_filter([
                     // Provide if you have them; Pix allows anonymous payer too
-                    'nome' => $this->name,
+                    'nome' => empty($this->name) ? "Cliente" : $this->name,
                     'cpf'  => '17212309800', // if you collected it
                 ]),
                 'valor'      => ['original' => $amount],

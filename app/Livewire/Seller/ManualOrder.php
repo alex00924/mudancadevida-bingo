@@ -17,48 +17,47 @@ class ManualOrder extends Component
     public string $name = '';
     public string $city = '';
     public string $phone = '';
-    public int $quantity = 1;
+    public string $card_number = '';
     public $cardPrice = 10;
     public $isEnabledSelling = true;
-    public $minimumPurchaseQuantity = 1;
     
     public function mount(Request $request) {
         $this->cardPrice = \App\Models\SiteSetting::getPrice();
         $this->isEnabledSelling = \App\Models\SiteSetting::isEnabledSelling();
-        $this->minimumPurchaseQuantity = \App\Models\SiteSetting::getMinimumPurchaseQuantity();
-        $this->quantity = $this->minimumPurchaseQuantity;
     }
 
     public function orderManually() {
-        $this->minimumPurchaseQuantity = \App\Models\SiteSetting::getMinimumPurchaseQuantity();
-        // Fetch next n rows from BingoCard after last ordered number
-        $lastOrder = OrderDetails::orderBy('id', 'desc')->first();
-        $lastId = 0;
-        if (!empty($lastOrder)) {
-            $lastId = $lastOrder->bingo_card_id;
-        }
-        $startSelling = \App\Models\SiteSetting::getStartSelling();
-        $lastId = max($lastId, $startSelling-1);
-
-        $endSelling = \App\Models\SiteSetting::getEndSelling();
-
-        if ($lastId + $this->quantity > $endSelling) {
-            $this->notify('Aguarde o retorno', 'Advertência', 'warning');
-            return;
-        }
-
+        // clear errors
+        $this->resetErrorBag();
+        $customMessage = [
+            'phone.regex' => 'O campo telefone deve estar no formato (99) 99999-9999.',
+        ];
         $rules = [
             'name' => ['nullable', 'string', 'max:255'],
             'phone' => ['required', 'regex:/\([0-9]{2}\) [0-9]{5}-[0-9]{4}/'],
             'city' => ['nullable', 'string', 'max:255'],
-            'quantity' => ['required', 'integer', "min:$this->minimumPurchaseQuantity"]
         ];
 
-
-        $customMessage = [
-            'quantity.min' => 'O campo quantidade deve ser pelo menos :min.'
-        ];
         $this->validate($rules, $customMessage);
+
+        // check if card_number is exists and not sold
+        // split card_number by '-'
+        $cardNumberParts = explode('-', $this->card_number);
+        if (count($cardNumberParts) != 2) {
+            $this->addError('card_number', 'Número da cartela inválido.');
+            return;
+        }
+        $bingoCard = BingoCards::where('card_number', $cardNumberParts[0])
+            ->where('card_digit', $cardNumberParts[1])->first();
+        if (empty($bingoCard)) {
+            $this->addError('card_number', 'Número da cartela inválido.');
+            return;
+        }
+        $isSold = OrderDetails::where('bingo_card_id', $bingoCard->id)->exists();
+        if ($isSold) {
+            $this->addError('card_number', 'Número da cartela já foi vendido.');
+            return;
+        }
 
         $user = User::where('phone', $this->phone)->first();
         if (empty($user)) {
@@ -87,17 +86,17 @@ class ManualOrder extends Component
             }
         }
 
-        $this->createOrder($user->id);
+        $this->createOrder($user->id, $bingoCard->id);
 
         $this->notify('Ordem criada com sucesso!', 'Sucesso', 'success');
         return redirect()->to('/vendedor/order/list');
     }
     
-    private function createOrder($user_id) {
+    private function createOrder($user_id, $bingo_card_id) {
         $newOrder = [
             'user_id' => $user_id,
-            'quantity' => $this->quantity,
-            'price' => $this->quantity * $this->cardPrice,
+            'quantity' => 1,
+            'price' => 1 * $this->cardPrice,
             'payment_status' => 1,
             'payment_id' => 'manual-'.$user_id.'-'.time(),
             'seller_id' => auth()->user()->id,
@@ -105,43 +104,11 @@ class ManualOrder extends Component
         
         // Create Orders
         $order = Orders::create($newOrder);
-
-        // Fetch bingo cards according to random/sequential order setting
-        $isRandomOrder = \App\Models\SiteSetting::isCardRandomOrder();
-        $bingoCards = collect();
-        $startSelling = \App\Models\SiteSetting::getStartSelling();
-        if ($isRandomOrder) {
-            // Fetch random unsold cards with id >= startSelling
-            // $soldCardIds = OrderDetails::pluck('bingo_card_id')->toArray();
-            // $bingoCards = BingoCards::whereNotIn('id', $soldCardIds)
-            //     ->where('id', '>=', $startSelling)
-            //     ->inRandomOrder()
-            //     ->limit($this->quantity)
-            //     ->get();
-            $bingoCards = BingoCards::whereNotIn('id', function($query) {
-                $query->select('bingo_card_id')->from('order_details');
-            })
-            ->where('id', '>=', $startSelling)
-            ->inRandomOrder()
-            ->limit($this->quantity)
-            ->get();
-        } else {
-            // Fetch sequential cards after the largest sold card or startSelling-1
-            $soldCardId = OrderDetails::max('bingo_card_id');
-            $lastId = max($soldCardId ?? 0, $startSelling-1);
-            $bingoCards = BingoCards::where('id', '>', $lastId)
-                ->orderBy('id')
-                ->limit($this->quantity)
-                ->get();
-        }
-
-        foreach($bingoCards as $bingoCard) {
-            OrderDetails::create([
-                'order_id' => $order->id,
-                'bingo_card_id' => $bingoCard->id,
-                'user_id' => $user_id
-            ]);
-        }
+        OrderDetails::create([
+            'order_id' => $order->id,
+            'bingo_card_id' => $bingo_card_id,
+            'user_id' => $user_id
+        ]);
     }
 
     public function render()

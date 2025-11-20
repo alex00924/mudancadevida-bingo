@@ -55,9 +55,9 @@
                 <div class="flex items-end gap-4 mt-4">
                     <!-- Quantity -->
                     <div class="grow">
-                        <div class="text-center"><x-input-label for="quantity" :value="__('№ DA CARTELA')" /></div>
-                        <x-text-input wire:model="quantity" id="quantity" class="block mt-1 w-full" type="number" name="quantity" autocomplete="quantity" />
-                        <x-input-error :messages="$errors->get('quantity')" class="mt-2" />
+                        <div class="text-center"><x-input-label for="card_number" :value="__('№ DA CARTELA')" /></div>
+                        <x-text-input wire:model="card_number" id="card_number" class="block mt-1 w-full" name="card_number" autocomplete="card_number" />
+                        <x-input-error :messages="$errors->get('card_number')" class="mt-2" />
                     </div>
                     <button class="flex-none rounded-lg py-2 px-8 bg-green-500 text-white font-semibold hover:bg-green-600" type="button" wire:click="orderManually">
                         CONFIRMA

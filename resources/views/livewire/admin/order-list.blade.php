@@ -75,19 +75,23 @@
                                 {{$item->id}}
                             </th>
                             <td class="px-6 py-4">
-                                {{$item->cardNumbers($cardFilter)}}
+                                @forelse($item->orderDetails as $detail)
+                                    {{ $detail->bingoCard?->card_number }}<br>
+                                @empty
+                                    N/A
+                                @endforelse
                             </td>
                             <td class="px-6 py-4">
-                                {{$item->user->name}}
+                                {{$item->user?->name ?? 'N/A'}}
                             </td>
                             <td class="px-6 py-4">
-                                {{$item->user->phone}}
+                                {{$item->user?->phone ?? 'N/A'}}
                             </td>
                             <td class="px-6 py-4">
-                                {{$item->user->city}}
+                                {{$item->user?->city ?? 'N/A'}}
                             </td>
                             <td class="px-6 py-4">
-                                {{empty($item->seller) ? "Site" : $item->seller->name}}
+                                {{$item->seller?->name ?? 'Site'}}
                             </td>
                             <td class="px-6 py-4">
                                 {{$item->price}}

@@ -31,18 +31,21 @@ class OrderList extends Component
 
     public function render()
     {
-        $orders = Orders::query();
+        $orders = Orders::query()
+            ->with(['user', 'seller', 'orderDetails.bingoCard'])
+            ->latest('id');
+        
         if (!empty($this->cardFilter)) {
             $orders = $orders->whereHas('orderDetails', function (Builder $query) {
                 $query->whereHas('bingoCard', function (Builder $query) {
-                    $query->where('card_number', 'like', "%" . $this->cardFilter . "%");
+                    $query->where('card_number', 'like', "%{$this->cardFilter}%");
                 });
             });
         }
 
         if (!empty($this->nameFilter)) {
             $orders = $orders->whereHas('user', function (Builder $query) {
-                $query->whereRaw("UPPER(name) LIKE '%" . strtoupper($this->nameFilter) . "%'");
+                $query->whereRaw("UPPER(name) LIKE UPPER(?)", ["%{$this->nameFilter}%"]);
             });
         }
 

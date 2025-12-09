@@ -41,14 +41,15 @@ class ManualOrder extends Component
         $this->validate($rules, $customMessage);
 
         // check if card_number is exists and not sold
-        // split card_number by '-'
-        $cardNumberParts = explode('-', $this->card_number);
-        if (count($cardNumberParts) != 2) {
+        // split card_number into main part and last digit
+        if (strlen($this->card_number) < 2) {
             $this->addError('card_number', 'Número da cartela inválido.');
             return;
         }
-        $bingoCard = BingoCards::where('card_number', $cardNumberParts[0])
-            ->where('card_digit', $cardNumberParts[1])->first();
+        $mainPart = substr($this->card_number, 0, -1);
+        $lastDigit = substr($this->card_number, -1);
+        $bingoCard = BingoCards::where('card_number', $mainPart)
+            ->where('card_digit', $lastDigit)->first();
         if (empty($bingoCard)) {
             $this->addError('card_number', 'Número da cartela inválido.');
             return;
